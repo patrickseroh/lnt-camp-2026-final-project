@@ -5,12 +5,11 @@ app = Flask(__name__)
 
 @app.route("/")
 def home():
-    return render_template("index.html", prediction=None, clf_result=None, clf_probability=None)
+    return render_template("index.html", prediction=None, clf_result=None, clf_probability=None, active_tab="sales-section")
 
 @app.route("/predict-sales", methods=["POST"])
 def predict_sales():
     form = request.form
-
     features = {
         "discount": float(form["discount"]),
         "quantity": int(form["quantity"]),
@@ -26,24 +25,19 @@ def predict_sales():
         f"ship_mode_{form['ship_mode']}": 1,
         f"order_priority_{form['order_priority']}": 1,
     }
-
-    response = requests.post(
-        "http://127.0.0.1:8000/predict/regression",
-        json={"features": features}
-    )
+    response = requests.post("http://127.0.0.1:8000/predict/regression", json={"features": features})
     result = response.json()
-
     return render_template(
         "index.html",
         prediction=result.get("predicted_sales"),
         clf_result=None,
-        clf_probability=None
+        clf_probability=None,
+        active_tab="sales-section"
     )
 
 @app.route("/predict-profitability", methods=["POST"])
 def predict_profitability():
     form = request.form
-
     features = {
         "discount": float(form["discount"]),
         "quantity": int(form["quantity"]),
@@ -60,19 +54,15 @@ def predict_profitability():
         f"ship_mode_{form['ship_mode']}": 1,
         f"order_priority_{form['order_priority']}": 1,
     }
-
-    response = requests.post(
-        "http://127.0.0.1:8000/predict/classification",
-        json={"features": features}
-    )
+    response = requests.post("http://127.0.0.1:8000/predict/classification", json={"features": features})
     result = response.json()
-
     return render_template(
         "index.html",
         prediction=None,
         clf_result=result.get("is_profitable"),
-        clf_probability=result.get("probability_profitable")
+        clf_probability=result.get("probability_profitable"),
+        active_tab="profit-section"
     )
 
-if __name__ == "__main__":
+if __name__ == "__main__": 
     app.run(debug=True)

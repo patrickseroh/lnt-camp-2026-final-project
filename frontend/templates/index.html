@@ -1,176 +1,204 @@
 <!DOCTYPE html>
-<html>
-<head>
-    <title>Superstore Prediction Tool</title>
-</head>
-<body>
-    <h1>Predict Sales</h1>
+<html lang="en">
+    <head>
+        <title>Global Superstore Prediction</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    </head>
+    <body>
+        <header class="main">
+            <div class="title">Global Superstore Prediction</div>
+            <div class="title-description">This website is contains of a prediction for Global Superstore sales and scan whether a order items is profitable or not.</div>
+            <div class="author">Patrick Lourens Samuel Seroh</div>
+        </header>
+        
+        <div class="button-container">
+            <button class="toggle-btn {% if active_tab == 'sales-section' %}active{% endif %}" data-target="sales-section">Sales Prediction</button>
+            <button class="toggle-btn {% if active_tab == 'profit-section' %}active{% endif %}" data-target="profit-section">Profitable Decision</button>
+        </div>
 
-    {% if prediction %}
-        <h2>Predicted Sales: ${{ "%.2f"|format(prediction) }}</h2>
-    {% endif %}
+        <div id="sales-section" class="tab-content {% if active_tab == 'sales-section' %}active{% endif %}">
+            <div class="container">
+                <h1>Predict Sales</h1>
 
-    <form action="/predict-sales" method="POST">
-        <label>Discount (0.0 - 0.85):</label>
-        <input type="number" step="0.01" name="discount" value="0.1" min="0" max="0.85"><br><br>
+                {% if prediction %}
+                    <div class="result result-success">
+                        Predicted Sales: ${{ "%.2f"|format(prediction) }}
+                    </div>
+                {% endif %}
 
-        <label>Quantity:</label>
-        <input type="number" name="quantity" value="3" min="1"><br><br>
+                <form action="/predict-sales" method="POST">
+                    <label>Discount: <span id="discount-value">0.1</span></label>
+                    <input type="range" name="discount" min="0" max="0.85" step="0.01" value="0.1" 
+                        oninput="document.getElementById('discount-value').innerText = this.value">
 
-        <label>Shipping Cost:</label>
-        <input type="number" step="0.01" name="shipping_cost" value="5.0"><br><br>
+                    <label>Quantity:</label>
+                    <input type="number" name="quantity" value="3" min="1">
 
-        <label>Delivery Duration (days):</label>
-        <input type="number" name="delivery_duration" value="4"><br><br>
+                    <label>Shipping Cost:</label>
+                    <input type="number" step="0.01" name="shipping_cost" value="5.0" min="0">
 
-        <label>Year:</label>
-        <select name="year">
-            <option value="2011">2011</option>
-            <option value="2012">2012</option>
-            <option value="2013">2013</option>
-            <option value="2014" selected>2014</option>
-        </select><br><br>
+                    <label>Delivery Duration (days):</label>
+                    <input type="number" name="delivery_duration" value="4" min="0">
 
-        <label>Week Number (1-52):</label>
-        <input type="number" name="week_num" value="20" min="1" max="52"><br><br>
+                    <label>Year:</label>
+                    <select name="year">
+                        <option value="2011">2011</option>
+                        <option value="2012">2012</option>
+                        <option value="2013">2013</option>
+                        <option value="2014" selected>2014</option>
+                    </select>
 
-        <label>Category:</label>
-        <select name="category">
-            <option>Office Supplies</option>
-            <option>Furniture</option>
-            <option>Technology</option>
-        </select><br><br>
+                    <label>Week Number (1-52):</label>
+                    <input type="number" name="week_num" value="20" min="1" max="52">
 
-        <label>Sub-Category:</label>
-        <select name="sub_category">
-            <option>Labels</option><option>Furnishings</option><option>Bookcases</option>
-            <option>Binders</option><option>Art</option><option>Envelopes</option>
-            <option>Machines</option><option>Supplies</option><option>Accessories</option>
-            <option>Fasteners</option><option>Chairs</option><option>Copiers</option>
-            <option>Storage</option><option>Phones</option><option>Appliances</option>
-            <option>Tables</option><option>Paper</option>
-        </select><br><br>
+                    <label>Category:</label>
+                    <select name="category" id="category-sales">
+                        <option>Office Supplies</option>
+                        <option>Furniture</option>
+                        <option>Technology</option>
+                    </select>
 
-        <label>Region:</label>
-        <select name="region">
-            <option>North</option><option>South</option><option>Central</option>
-            <option>Caribbean</option><option>North Asia</option><option>Southeast Asia</option>
-            <option>Central Asia</option><option>Oceania</option><option>West</option>
-            <option>East</option><option>Africa</option><option>EMEA</option><option>Canada</option>
-        </select><br><br>
+                    <label>Sub-Category:</label>
+                    <select name="sub_category" id="sub_category-sales">
+                    </select>
 
-        <label>Market:</label>
-        <select name="market">
-            <option>LATAM</option><option>EU</option><option>APAC</option><option>US</option>
-            <option>Africa</option><option>EMEA</option><option>Canada</option>
-        </select><br><br>
+                    <label>Sub-Category:</label>
+                    <select name="sub_category">
+                        <option>Labels</option><option>Furnishings</option><option>Bookcases</option>
+                        <option>Binders</option><option>Art</option><option>Envelopes</option>
+                        <option>Machines</option><option>Supplies</option><option>Accessories</option>
+                        <option>Fasteners</option><option>Chairs</option><option>Copiers</option>
+                        <option>Storage</option><option>Phones</option><option>Appliances</option>
+                        <option>Tables</option><option>Paper</option>
+                    </select>
 
-        <label>Segment:</label>
-        <select name="segment">
-            <option>Consumer</option><option>Home Office</option><option>Corporate</option>
-        </select><br><br>
+                    <label>Market:</label>
+                    <select name="market" id="market-sales">
+                        <option>LATAM</option><option>EU</option><option>APAC</option><option>US</option>
+                        <option>Africa</option><option>EMEA</option><option>Canada</option>
+                    </select>
 
-        <label>Ship Mode:</label>
-        <select name="ship_mode">
-            <option>Standard Class</option><option>Second Class</option>
-            <option>First Class</option><option>Same Day</option>
-        </select><br><br>
+                    <label>Region:</label>
+                    <select name="region" id="region-sales">
+                    </select>
 
-        <label>Order Priority:</label>
-        <select name="order_priority">
-            <option>Medium</option><option>Low</option><option>High</option><option>Critical</option>
-        </select><br><br>
+                    <label>Segment:</label>
+                    <select name="segment">
+                        <option>Consumer</option><option>Home Office</option><option>Corporate</option>
+                    </select>
 
-        <button type="submit">Predict Sales</button>
-    </form>
-    <hr><br>
+                    <label>Ship Mode:</label>
+                    <select name="ship_mode">
+                        <option>Standard Class</option><option>Second Class</option>
+                        <option>First Class</option><option>Same Day</option>
+                    </select>
 
-<h1>Predict Profitability</h1>
+                    <label>Order Priority:</label>
+                    <select name="order_priority">
+                        <option>Medium</option><option>Low</option><option>High</option><option>Critical</option>
+                    </select>
 
-{% if clf_result is not none %}
-    {% if clf_result == 1 %}
-        <h2>Prediction: Profitable ✅</h2>
-    {% else %}
-        <h2>Prediction: Not Profitable ❌</h2>
-    {% endif %}
-    <p>Confidence: {{ "%.1f"|format(clf_probability * 100) }}%</p>
-{% endif %}
+                    <button type="submit">Predict Sales</button>
+                </form>
+            </div>
+        </div>
 
-<form action="/predict-profitability" method="POST">
-    <label>Discount (0.0 - 0.85):</label>
-    <input type="number" step="0.01" name="discount" value="0.1" min="0" max="0.85"><br><br>
+        <div id="profit-section" class="tab-content {% if active_tab == 'profit-section' %}active{% endif %}">
+            <div class="container">
+                <h1>Predict Profitability</h1>
 
-    <label>Quantity:</label>
-    <input type="number" name="quantity" value="3" min="1"><br><br>
+                {% if clf_result is not none %}
+                    {% if clf_result == 1 %}
+                        <div class="result result-success">
+                            Prediction: Profitable ✅ ({{ "%.1f"|format(clf_probability * 100) }}% confidence)
+                        </div>
+                    {% else %}
+                        <div class="result result-fail">
+                            Prediction: Not Profitable ❌ ({{ "%.1f"|format(clf_probability * 100) }}% confidence)
+                        </div>
+                    {% endif %}
+                {% endif %}
 
-    <label>Sales ($):</label>
-    <input type="number" step="0.01" name="sales" value="100.0"><br><br>
+                <form action="/predict-profitability" method="POST">
+                <label>Discount: <span id="discount-value-profit">0.1</span></label>
+                <input type="range" name="discount" min="0" max="0.85" step="0.01" value="0.1" 
+                    oninput="document.getElementById('discount-value-profit').innerText = this.value">
 
-    <label>Shipping Cost:</label>
-    <input type="number" step="0.01" name="shipping_cost" value="5.0"><br><br>
+                    <label>Quantity:</label>
+                    <input type="number" name="quantity" value="3" min="1">
 
-    <label>Delivery Duration (days):</label>
-    <input type="number" name="delivery_duration" value="4"><br><br>
+                    <label>Sales ($):</label>
+                    <input type="number" step="0.01" name="sales" value="100.0">
 
-    <label>Year:</label>
-    <select name="year">
-        <option value="2011">2011</option>
-        <option value="2012">2012</option>
-        <option value="2013">2013</option>
-        <option value="2014" selected>2014</option>
-    </select><br><br>
+                    <label>Shipping Cost:</label>
+                    <input type="number" step="0.01" name="shipping_cost" value="5.0" min="0">
 
-    <label>Week Number (1-52):</label>
-    <input type="number" name="week_num" value="20" min="1" max="52"><br><br>
+                    <label>Delivery Duration (days):</label>
+                    <input type="number" name="delivery_duration" value="4" min="0">
 
-    <label>Category:</label>
-    <select name="category">
-        <option>Office Supplies</option>
-        <option>Furniture</option>
-        <option>Technology</option>
-    </select><br><br>
+                    <label>Year:</label>
+                    <select name="year">
+                        <option value="2011">2011</option>
+                        <option value="2012">2012</option>
+                        <option value="2013">2013</option>
+                        <option value="2014" selected>2014</option>
+                    </select>
 
-    <label>Sub-Category:</label>
-    <select name="sub_category">
-        <option>Labels</option><option>Furnishings</option><option>Bookcases</option>
-        <option>Binders</option><option>Art</option><option>Envelopes</option>
-        <option>Machines</option><option>Supplies</option><option>Accessories</option>
-        <option>Fasteners</option><option>Chairs</option><option>Copiers</option>
-        <option>Storage</option><option>Phones</option><option>Appliances</option>
-        <option>Tables</option><option>Paper</option>
-    </select><br><br>
+                    <label>Week Number (1-52):</label>
+                    <input type="number" name="week_num" value="20" min="1" max="52">
 
-    <label>Region:</label>
-    <select name="region">
-        <option>North</option><option>South</option><option>Central</option>
-        <option>Caribbean</option><option>North Asia</option><option>Southeast Asia</option>
-        <option>Central Asia</option><option>Oceania</option><option>West</option>
-        <option>East</option><option>Africa</option><option>EMEA</option><option>Canada</option>
-    </select><br><br>
+                    <label>Category:</label>
+                    <select name="category" id="category-profit">
+                        <option>Office Supplies</option>
+                        <option>Furniture</option>
+                        <option>Technology</option>
+                    </select>
 
-    <label>Market:</label>
-    <select name="market">
-        <option>LATAM</option><option>EU</option><option>APAC</option><option>US</option>
-        <option>Africa</option><option>EMEA</option><option>Canada</option>
-    </select><br><br>
+                    <label>Sub-Category:</label>
+                    <select name="sub_category" id="sub_category-profit">
+                    </select>
 
-    <label>Segment:</label>
-    <select name="segment">
-        <option>Consumer</option><option>Home Office</option><option>Corporate</option>
-    </select><br><br>
+                    <label>Sub-Category:</label>
+                    <select name="sub_category">
+                        <option>Labels</option><option>Furnishings</option><option>Bookcases</option>
+                        <option>Binders</option><option>Art</option><option>Envelopes</option>
+                        <option>Machines</option><option>Supplies</option><option>Accessories</option>
+                        <option>Fasteners</option><option>Chairs</option><option>Copiers</option>
+                        <option>Storage</option><option>Phones</option><option>Appliances</option>
+                        <option>Tables</option><option>Paper</option>
+                    </select>
 
-    <label>Ship Mode:</label>
-    <select name="ship_mode">
-        <option>Standard Class</option><option>Second Class</option>
-        <option>First Class</option><option>Same Day</option>
-    </select><br><br>
+                    <label>Market:</label>
+                    <select name="market" id="market-sales">
+                        <option>LATAM</option><option>EU</option><option>APAC</option><option>US</option>
+                        <option>Africa</option><option>EMEA</option><option>Canada</option>
+                    </select>
 
-    <label>Order Priority:</label>
-    <select name="order_priority">
-        <option>Medium</option><option>Low</option><option>High</option><option>Critical</option>
-    </select><br><br>
+                    <label>Region:</label>
+                    <select name="region" id="region-sales">
+                    </select>
 
-    <button type="submit">Predict Profitability</button>
-</form>
-</body>
+                    <label>Segment:</label>
+                    <select name="segment">
+                        <option>Consumer</option><option>Home Office</option><option>Corporate</option>
+                    </select>
+
+                    <label>Ship Mode:</label>
+                    <select name="ship_mode">
+                        <option>Standard Class</option><option>Second Class</option>
+                        <option>First Class</option><option>Same Day</option>
+                    </select>
+
+                    <label>Order Priority:</label>
+                    <select name="order_priority">
+                        <option>Medium</option><option>Low</option><option>High</option><option>Critical</option>
+                    </select>
+
+                    <button type="submit">Predict Profitability</button>
+                </form>
+            </div>
+        </div>
+        
+    </body>
 </html>
