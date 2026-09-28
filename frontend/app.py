@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request
+import os
 import requests
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
+
+BACKEND_URL = os.environ.get("BACKEND_URL", "http://127.0.0.1:8000")
 
 @app.route("/")
 def home():
@@ -25,7 +28,7 @@ def predict_sales():
         f"ship_mode_{form['ship_mode']}": 1,
         f"order_priority_{form['order_priority']}": 1,
     }
-    response = requests.post("http://127.0.0.1:8000/predict/regression", json={"features": features})
+    response = requests.post(f"{BACKEND_URL}/predict/regression", json={"features": features})
     result = response.json()
     return render_template(
         "index.html",
@@ -54,7 +57,7 @@ def predict_profitability():
         f"ship_mode_{form['ship_mode']}": 1,
         f"order_priority_{form['order_priority']}": 1,
     }
-    response = requests.post("http://127.0.0.1:8000/predict/classification", json={"features": features})
+    response = requests.post(f"{BACKEND_URL}/predict/classification", json={"features": features})
     result = response.json()
     return render_template(
         "index.html",

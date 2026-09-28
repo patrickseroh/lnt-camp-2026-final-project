@@ -1,16 +1,19 @@
 import json
 import joblib
 import pandas as pd
+from pathlib import Path
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
 
-model_reg = joblib.load('../model/regression_model.pkl')
-model_clf = joblib.load('../model/classification_model.pkl')
-scaler = joblib.load('../model/scaler.pkl')
+MODEL_DIR = Path(__file__).resolve().parent.parent / "model"
 
-with open('../model/feature_columns.json') as f:
+model_reg = joblib.load(MODEL_DIR / "regression_model.pkl")
+model_clf = joblib.load(MODEL_DIR / "classification_model.pkl")
+scaler = joblib.load(MODEL_DIR / "scaler.pkl")
+
+with open(MODEL_DIR / "feature_columns.json") as f:
     feature_columns = json.load(f)
 
 @app.get("/health")
