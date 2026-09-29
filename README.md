@@ -79,7 +79,8 @@ Backend: joblib, pandas, FastAPI, pydantic
 Modelling: joblib, sqlite3, numpy, pandas, seaborn, matplotlib, scikit-learn
 
 ### Links
-Deploy Frontend:
+Frontend Links: https://superstore-frontend.vercel.app/
+Backend Links: https://superstore-backend.vercel.app/
 LinkedIn post: 
 
 ### Social
